@@ -1,4 +1,6 @@
 const { EntitySchema } = require('typeorm');
+const bcrypt = require('bcrypt');
+
 const UserSchema = new EntitySchema({
   name: 'User',
   columns: {
@@ -16,7 +18,10 @@ const UserSchema = new EntitySchema({
     password: {
       type: 'varchar'
     }
-  }
+  },
+  /*checks: [    
+    { expression: `email ~ '^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$'`, name: 'valid_email_format' }
+  ]*/
 });
 
 module.exports = UserSchema;

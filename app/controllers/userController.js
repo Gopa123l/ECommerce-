@@ -19,6 +19,7 @@ exports.getUserById = async (req, res) => {
     const userId = req.params.id;
     const connection = getConnection();
     const user = await connection.query('SELECT * FROM "user" WHERE id = $1', [userId]);
+    console.log(user)
     if (user.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
@@ -33,16 +34,28 @@ exports.createUser = async (req, res) => {
   try {
     const { username, email, password } = req.body;
     const connection = getConnection();
+    const getExistingUser= await getUserByEmail(email)
+    if(getExistingUser){
+      return res.status(400).json({error: 'Email already in use'})
+    }
     const result = await connection.query(
       'INSERT INTO "user" ("username", "email", "password") VALUES ($1, $2, $3) RETURNING *',
       [username, email, password]
     );
+    console.log(result.length)
     res.status(201).json(result);
   } catch (error) {
     console.error('Error creating user:', error);
     res.status(500).json({ error: 'Internal server error' });
   }
 };
+
+const getUserByEmail= async(email) => {
+  const connection= await getConnection();
+  const result= await connection.query('SELECT * FROM "user" where email=$1', [email]);
+  console.log(result)
+  return result[0];
+}
 
 exports.updateUser = async (req, res) => {
   try {
@@ -53,6 +66,7 @@ exports.updateUser = async (req, res) => {
       'UPDATE "user" SET "username" = $1, "email" = $2, "password" = $3 WHERE id = $4 RETURNING *',
       [username, email, password, userId]
     );
+    console.log(result)
     if (result[0].length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }

@@ -34,7 +34,7 @@ exports.getOrderByUserId = async (req, res) => {
     const userId = req.params.id;
     const connection= await getConnection();
     const order = await connection.query('SELECT * FROM "order" WHERE "userId" = $1', [userId]);    
-    if (order.length === 0) {
+    if (order[0].length === 0) {
       return res.status(404).json({ error: 'Order not found' });
     }
     res.json(order);
